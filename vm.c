@@ -44,11 +44,85 @@ int main(int argc, char **argv)
 	{
 		switch (text[pc].opcode)
 		{
+			case 1 :
+				sp++;
+				stack[sp] = text[pc].m;
+				break;
 
+			case 2 :
+				switch (text[pc].m)
+				{
+					case 0 :
+						stack[bp-1] = stack[sp];
+						sp = bp-1;
+						bp = stack[sp+2];
+						pc = stack[sp+3];
+						break;
 
+					case 1 :
+						stack[sp] = -1 * stack[sp];
+						break;
 
+					case 2 :
+						sp = sp-1;
+						stack[sp] = stack[sp] + stack[sp+1];
+						break;
 
+					case 3:
+						sp = sp - 1;
+						stack[sp] = stack[sp] - stack[sp + 1];
+						break;
 
+					case 4 :
+						sp = sp - 1;
+						stack[sp] = stack[sp] * stack[sp+1];
+						break;
+
+					case 5 :
+						sp = sp - 1;
+						stack[sp] = stack[sp] / stack[sp+1];
+						break;
+
+					case 6 :
+						stack[sp] = stack[sp] % 2;
+						break;
+
+					case 7 :
+						sp = sp - 1;
+						stack[sp] = stack[sp] % stack[sp+1];
+						break;
+
+					case 8 :
+						sp = sp - 1;
+						stack[sp] = (stack[sp] == stack[sp+1]);
+						break;
+
+					case 9 :
+						sp = sp - 1;
+						stack[sp] = stack[sp] != stack[sp + 1];
+						break;
+
+					case 10 :
+						sp = sp - 1;
+						stack[sp] = stack[sp] < stack[sp + 1];
+						break;
+
+					case 11 :
+						sp = sp - 1;
+						stack[sp] = stack[sp] <= stack[sp + 1];
+						break;
+
+					case 12 :
+						sp = sp - 1;
+						stack[sp] = stack[sp] > stack[sp + 1];
+						break;
+
+					case 13 :
+						sp = sp - 1;
+						stack[sp] = stack[sp] >= stack[sp + 1];
+						break;
+				}
+				break;
 		}
 		pc++;
 	}
