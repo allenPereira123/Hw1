@@ -38,4 +38,5 @@ int main(int argc, char **argv)
 	printf("\t\t PC\tBP\tSP\tstack\n");
 	printf("Initial values:  %2d\t%2d\t%2d\n",pc,bp,sp);
 
+	
 }
