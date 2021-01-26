@@ -13,6 +13,18 @@ typedef struct instruction
 
 } instruction;
 
+int base(int stack[], int level, int BP)
+{
+	int base = BP;
+	int counter = level;
+	while (counter > 0)
+	{
+		base = stack[base];
+		counter--;
+	}
+	return base;
+}
+
 
 
 int main(int argc, char **argv)
@@ -32,98 +44,133 @@ int main(int argc, char **argv)
   while (feof(file_ptr) == 0)
   {
     fscanf(file_ptr, "%d %d %d", &text[count].opcode, &text[count].l, &text[count].m);
+	//	printf("%d %d %d \n", text[count].opcode, text[count].l, text[count].m);
     count++;
+
   }
+
+	for (int i =0; i < MAX_STACK_HEIGHT; i++)
+	{
+		stack[i] = 0;
+	}
 
 	last_index = count - 1;
 
-	printf("\t\t PC\tBP\tSP\tstack\n");
+	printf("\t\t  PC\tBP\tSP\tstack\n");
 	printf("Initial values:  %2d\t%2d\t%2d\n",pc,bp,sp);
 
 	while (halt)
 	{
 		switch (text[pc].opcode)
 		{
-			case 1 :
+			case 1:
 				sp++;
 				stack[sp] = text[pc].m;
+				printf("%2d LIT %2d %2d", pc, text[pc].l, text[pc].m);
+				pc++;
+				printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
+
+				for (int i = 0; i <= sp; i++)
+				{
+					printf("%d", stack[i]);
+				}
+				printf("\n");
 				break;
 
-			case 2 :
+			case 3:
+				sp++;
+				stack[sp] = stack(base(stack,))
+
+			case 6:
+				sp += text[pc].m;
+				printf("%2d INC %2d %2d", pc, text[pc].l, text[pc].m);
+				pc++;
+				printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
+
+				for (int i = 0; i <= sp; i++)
+					printf("%d", stack[i]);
+
+				printf("\n");
+				break;
+
+			case 7:
+				printf("%2d JMP %2d %2d", pc, text[pc].l, text[pc].m);
+				pc = text[pc].m;
+				printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
+
+				for (int i = 0; i <= sp; i++)
+					printf("%d", stack[i]);
+
+				printf("\n");
+				break;
+
+
+			case 9:
 				switch (text[pc].m)
 				{
-					case 0 :
-						stack[bp-1] = stack[sp];
-						sp = bp-1;
-						bp = stack[sp+2];
-						pc = stack[sp+3];
+					case 1:
+						printf("Top of Stack Value: %d\n", stack[sp]);
+						sp--;
+						printf("%2d SYS %2d %2d", pc, text[pc].l, text[pc].m);
+						pc++;
+						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
+
+						for (int i = 0; i <= sp; i++)
+							printf("%d", stack[i]);
+
+						printf("\n");
 						break;
 
-					case 1 :
-						stack[sp] = -1 * stack[sp];
-						break;
+					case 2:
+						sp++;
+						printf("Please Enter an Integer: ");
+						scanf("%d", &stack[sp]);
 
-					case 2 :
-						sp = sp-1;
-						stack[sp] = stack[sp] + stack[sp+1];
+						printf("%2d SYS %2d %2d", pc, text[pc].l, text[pc].m);
+						pc++;
+						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
+
+						for (int i = 0; i <= sp; i++)
+							printf("%d", stack[i]);
+
+						printf("\n");
 						break;
 
 					case 3:
-						sp = sp - 1;
-						stack[sp] = stack[sp] - stack[sp + 1];
-						break;
+						printf("%2d SYS %2d %2d", pc, text[pc].l, text[pc].m);
+						pc++;
+						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 
-					case 4 :
-						sp = sp - 1;
-						stack[sp] = stack[sp] * stack[sp+1];
-						break;
+						for (int i = 0; i <= sp; i++)
+							printf("%d", stack[i]);
 
-					case 5 :
-						sp = sp - 1;
-						stack[sp] = stack[sp] / stack[sp+1];
-						break;
-
-					case 6 :
-						stack[sp] = stack[sp] % 2;
-						break;
-
-					case 7 :
-						sp = sp - 1;
-						stack[sp] = stack[sp] % stack[sp+1];
-						break;
-
-					case 8 :
-						sp = sp - 1;
-						stack[sp] = (stack[sp] == stack[sp+1]);
-						break;
-
-					case 9 :
-						sp = sp - 1;
-						stack[sp] = stack[sp] != stack[sp + 1];
-						break;
-
-					case 10 :
-						sp = sp - 1;
-						stack[sp] = stack[sp] < stack[sp + 1];
-						break;
-
-					case 11 :
-						sp = sp - 1;
-						stack[sp] = stack[sp] <= stack[sp + 1];
-						break;
-
-					case 12 :
-						sp = sp - 1;
-						stack[sp] = stack[sp] > stack[sp + 1];
-						break;
-
-					case 13 :
-						sp = sp - 1;
-						stack[sp] = stack[sp] >= stack[sp + 1];
+						printf("\n");
+						halt = 0;
 						break;
 				}
 				break;
 		}
-		pc++;
+
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
