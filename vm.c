@@ -1,3 +1,5 @@
+// Allen Pereira
+// Allec Pereira
 #include <stdlib.h>
 #include <stdio.h>
 
