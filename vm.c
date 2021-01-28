@@ -38,9 +38,8 @@ int main(int argc, char **argv)
   int count = 0;
 	int sp = -1;
 	int bp = 0;
+	int old_pc  = 0;
 	int pc = 0;
-	instruction *ir = NULL;
-	int last_index = -1;
 	int halt = 1;
 
 
@@ -59,21 +58,22 @@ int main(int argc, char **argv)
 		stack[i] = 0;
 	}
 
-	last_index = count - 1;
+
 
 	printf("\t\t  PC\tBP\tSP\tstack\n");
 	printf("Initial values:  %2d\t%2d\t%2d\n",pc,bp,sp);
 
 	while (halt)
 	{
-		switch (text[pc].opcode)
+		old_pc = pc;
+		pc++;
+		switch (text[old_pc].opcode)
 		{
-		
+
 			case 1:
 				sp++;
-				stack[sp] = text[pc].m;
-				printf("%2d LIT %2d %2d", pc, text[pc].l, text[pc].m);
-				pc++;
+				stack[sp] = text[old_pc].m;
+				printf("%2d LIT %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
 				printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 
 				for (int i = 0; i <= sp; i++)
@@ -86,14 +86,14 @@ int main(int argc, char **argv)
 				break;
 
 			case 2:
-				switch (text[pc].m)
+				switch (text[old_pc].m)
 				{
 					case 0:
 						stack[bp-1] = stack[sp];
 						sp = bp-1;
 						static_links[bp] = 0;
 						bp = stack[sp+2];
-						printf("%2d RTN %2d %2d", pc, text[pc].l, text[pc].m);
+						printf("%2d RTN %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
 						pc = stack[sp+3];
 
 						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
@@ -110,8 +110,8 @@ int main(int argc, char **argv)
 					case 4:
 						sp = sp - 1;
 						stack[sp] = stack[sp] * stack[sp+1];
-						printf("%2d MUL %2d %2d", pc, text[pc].l, text[pc].m);
-						pc++;
+						printf("%2d MUL %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+
 
 						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 
@@ -127,8 +127,8 @@ int main(int argc, char **argv)
 						case 10:
 							sp = sp - 1;
 							stack[sp] = stack[sp] < stack[sp+1];
-							printf("%2d LSS %2d %2d", pc, text[pc].l, text[pc].m);
-							pc++;
+							printf("%2d LSS %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+
 
 							printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 
@@ -148,9 +148,9 @@ int main(int argc, char **argv)
 
 			case 3:
 				sp = sp + 1;
-				stack[sp] = stack[base(stack, text[pc].l,bp) + text[pc].m];
-				printf("%2d LOD %2d %2d", pc, text[pc].l, text[pc].m);
-				pc++;
+				stack[sp] = stack[base(stack, text[old_pc].l,bp) + text[old_pc].m];
+				printf("%2d LOD %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+
 				printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 
 				for (int i = 0; i <= sp; i++)
@@ -163,10 +163,10 @@ int main(int argc, char **argv)
 				break;
 
 			case 4:
-				stack[base(stack, text[pc].l,bp) + text[pc].m] = stack[sp];
+				stack[base(stack, text[old_pc].l,bp) + text[old_pc].m] = stack[sp];
 				sp = sp - 1;
-				printf("%2d STO %2d %2d", pc, text[pc].l, text[pc].m);
-				pc++;
+				printf("%2d STO %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+
 				printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 
 				for (int i = 0; i <= sp; i++)
@@ -180,14 +180,14 @@ int main(int argc, char **argv)
 
 
 			case 5:
-				stack[sp+1] = base(stack, text[pc].l,bp);
+				stack[sp+1] = base(stack, text[old_pc].l,bp);
 				static_links[sp+1] = 1;
 				stack[sp+2] = bp;
-				stack[sp+3] =  pc+1;
+				stack[sp+3] =  old_pc+1;
 				stack[sp+4] = stack[sp];
 				bp = sp + 1;
-				printf("%2d CAL %2d %2d", pc, text[pc].l, text[pc].m);
-				pc = text[pc].m;
+				printf("%2d CAL %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+				pc = text[old_pc].m;
 				printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 
 
@@ -202,9 +202,9 @@ int main(int argc, char **argv)
 
 
 			case 6:
-				sp += text[pc].m;
-				printf("%2d INC %2d %2d", pc, text[pc].l, text[pc].m);
-				pc++;
+				sp += text[old_pc].m;
+				printf("%2d INC %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+
 				printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 
 				for (int i = 0; i <= sp; i++)
@@ -219,8 +219,8 @@ int main(int argc, char **argv)
 				break;
 
 			case 7:
-				printf("%2d JMP %2d %2d", pc, text[pc].l, text[pc].m);
-				pc = text[pc].m;
+				printf("%2d JMP %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+				pc = text[old_pc].m;
 				printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 
 				for (int i = 0; i <= sp; i++)
@@ -234,11 +234,10 @@ int main(int argc, char **argv)
 				break;
 
 			case 8:
-				printf("%2d JPC %2d %2d", pc, text[pc].l, text[pc].m);
+				printf("%2d JCP %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
 				if (stack[sp] == 0)
-					pc = text[pc].m;
-				else
-					pc++;
+					pc = text[old_pc].m;
+
 
 				printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 				for (int i = 0; i <= sp; i++)
@@ -252,13 +251,13 @@ int main(int argc, char **argv)
 				break;
 
 			case 9:
-				switch (text[pc].m)
+				switch (text[old_pc].m)
 				{
 					case 1:
 						printf("Top of Stack Value: %d\n", stack[sp]);
 						sp--;
-						printf("%2d SYS %2d %2d", pc, text[pc].l, text[pc].m);
-						pc++;
+						printf("%2d SYS %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+
 						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 
 						for (int i = 0; i <= sp; i++)
@@ -275,9 +274,9 @@ int main(int argc, char **argv)
 						sp++;
 						printf("Please Enter an Integer: ");
 						scanf("%d", &stack[sp]);
+						printf("\n");
+						printf("%2d SYS %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
 
-						printf("%2d SYS %2d %2d", pc, text[pc].l, text[pc].m);
-						pc++;
 						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 
 						for (int i = 0; i <= sp; i++)
@@ -291,8 +290,8 @@ int main(int argc, char **argv)
 						break;
 
 					case 3:
-						printf("%2d SYS %2d %2d", pc, text[pc].l, text[pc].m);
-						pc++;
+						printf("%2d SYS %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+
 						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 
 						for (int i = 0; i <= sp; i++)
@@ -310,25 +309,4 @@ int main(int argc, char **argv)
 		}
 
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
