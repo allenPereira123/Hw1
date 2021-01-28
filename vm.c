@@ -68,6 +68,7 @@ int main(int argc, char **argv)
 	{
 		switch (text[pc].opcode)
 		{
+		
 			case 1:
 				sp++;
 				stack[sp] = text[pc].m;
@@ -94,7 +95,7 @@ int main(int argc, char **argv)
 						bp = stack[sp+2];
 						printf("%2d RTN %2d %2d", pc, text[pc].l, text[pc].m);
 						pc = stack[sp+3];
-						
+
 						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 
 						for (int i = 0; i <= sp; i++)
@@ -105,6 +106,43 @@ int main(int argc, char **argv)
 						}
 						printf("\n");
 						break;
+
+					case 4:
+						sp = sp - 1;
+						stack[sp] = stack[sp] * stack[sp+1];
+						printf("%2d MUL %2d %2d", pc, text[pc].l, text[pc].m);
+						pc++;
+
+						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
+
+						for (int i = 0; i <= sp; i++)
+						{
+							if (static_links[i])
+								printf("|");
+							printf("%d", stack[i]);
+						}
+						printf("\n");
+						break;
+
+						case 10:
+							sp = sp - 1;
+							stack[sp] = stack[sp] < stack[sp+1];
+							printf("%2d LSS %2d %2d", pc, text[pc].l, text[pc].m);
+							pc++;
+
+							printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
+
+							for (int i = 0; i <= sp; i++)
+							{
+								if (static_links[i])
+									printf("|");
+								printf("%d", stack[i]);
+							}
+							printf("\n");
+							break;
+
+
+
 				}
 				break;
 
@@ -127,7 +165,7 @@ int main(int argc, char **argv)
 			case 4:
 				stack[base(stack, text[pc].l,bp) + text[pc].m] = stack[sp];
 				sp = sp - 1;
-				printf("%2d RTN %2d %2d", pc, text[pc].l, text[pc].m);
+				printf("%2d STO %2d %2d", pc, text[pc].l, text[pc].m);
 				pc++;
 				printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 
@@ -196,9 +234,11 @@ int main(int argc, char **argv)
 				break;
 
 			case 8:
-				printf("%2d JMP %2d %2d", pc, text[pc].l, text[pc].m);
+				printf("%2d JPC %2d %2d", pc, text[pc].l, text[pc].m);
 				if (stack[sp] == 0)
 					pc = text[pc].m;
+				else
+					pc++;
 
 				printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 				for (int i = 0; i <= sp; i++)
