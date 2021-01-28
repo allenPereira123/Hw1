@@ -107,6 +107,50 @@ int main(int argc, char **argv)
 						printf("\n");
 						break;
 
+					case 1:
+						stack[sp] = -1 * stack[sp];
+						printf("%2d NEG %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
+
+						for (int i = 0; i <= sp; i++)
+						{
+							if (static_links[i])
+								printf("|");
+							printf("%d", stack[i]);
+						}
+						printf("\n");
+						break;
+
+					case 2:
+						sp = sp - 1;
+						stack[sp] = stack[sp] + stack[sp + 1];
+						printf("%2d ADD %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
+
+						for (int i = 0; i <= sp; i++)
+						{
+							if (static_links[i])
+								printf("|");
+							printf("%d", stack[i]);
+						}
+						printf("\n");
+						break;
+
+					case 3:
+					sp = sp - 1;
+					stack[sp] = stack[sp] - stack[sp + 1];
+					printf("%2d SUB %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+					printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
+
+					for (int i = 0; i <= sp; i++)
+					{
+						if (static_links[i])
+							printf("|");
+						printf("%d", stack[i]);
+					}
+					printf("\n");
+					break;
+
 					case 4:
 						sp = sp - 1;
 						stack[sp] = stack[sp] * stack[sp+1];
@@ -124,26 +168,144 @@ int main(int argc, char **argv)
 						printf("\n");
 						break;
 
-						case 10:
-							sp = sp - 1;
-							stack[sp] = stack[sp] < stack[sp+1];
-							printf("%2d LSS %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+					case 5:
+						sp = sp - 1;
+						stack[sp] = stack[sp] * stack[sp+1];
+						printf("%2d DIV %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 
-
-							printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
-
-							for (int i = 0; i <= sp; i++)
-							{
-								if (static_links[i])
-									printf("|");
+						for (int i = 0; i <= sp; i++)
+						{
+							if (static_links[i])
+								printf("|");
 								printf("%d", stack[i]);
-							}
-							printf("\n");
-							break;
+						}
+						printf("\n");
+						break;
+
+					case 6:
+						stack[sp] = stack[sp] % 2;
+						sp = sp - 1;
+						stack[sp] = stack[sp] * stack[sp+1];
+						printf("%2d ODD %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
+
+						for (int i = 0; i <= sp; i++)
+						{
+							if (static_links[i])
+								printf("|");
+							printf("%d", stack[i]);
+						}
+						printf("\n");
+						break;
+
+					case 7:
+						sp = sp - 1;
+						stack[sp] = stack[sp] % stack[sp+1];
+						printf("%2d MOD %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
+
+						for (int i = 0; i <= sp; i++)
+						{
+							if (static_links[i])
+								printf("|");
+							printf("%d", stack[i]);
+						}
+						printf("\n");
+						break;
+
+					case 8:
+						sp = sp - 1;
+						stack[sp] = stack[sp] == stack[sp+1];
+						printf("%2d EQL %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
+
+						for (int i = 0; i <= sp; i++)
+						{
+							if (static_links[i])
+								printf("|");
+							printf("%d", stack[i]);
+						}
+						printf("\n");
+						break;
+
+					case 9:
+						sp = sp - 1;
+						stack[sp] = stack[sp] != stack[sp+1];
+						printf("%2d NEQ %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
+
+						for (int i = 0; i <= sp; i++)
+						{
+							if (static_links[i])
+								printf("|");
+							printf("%d", stack[i]);
+						}
+						printf("\n");
+						break;
+
+					case 10:
+						sp = sp - 1;
+						stack[sp] = stack[sp] < stack[sp+1];
+						printf("%2d LSS %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
+
+						for (int i = 0; i <= sp; i++)
+						{
+							if (static_links[i])
+								printf("|");
+							printf("%d", stack[i]);
+						}
+						printf("\n");
+						break;
+
+					case 11:
+						sp = sp - 1;
+						stack[sp] = stack[sp] <= stack[sp+1];
+						printf("%2d LEQ %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
+
+						for (int i = 0; i <= sp; i++)
+						{
+							if (static_links[i])
+								printf("|");
+							printf("%d", stack[i]);
+						}
+						printf("\n");
+						break;
+
+					case 12:
+						sp = sp - 1;
+						stack[sp] = stack[sp] > stack[sp+1];
+						printf("%2d GTR %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
+
+						for (int i = 0; i <= sp; i++)
+						{
+							if (static_links[i])
+								printf("|");
+							printf("%d", stack[i]);
+						}
+						printf("\n");
+						break;
+
+					case 13:
+						sp = sp - 1;
+						stack[sp] = stack[sp] < stack[sp+1];
+						printf("%2d GEQ %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
+
+						for (int i = 0; i >= sp; i++)
+						{
+							if (static_links[i])
+								printf("|");
+							printf("%d", stack[i]);
+						}
+						printf("\n");
+						break;
 
 
-
-				}
+					}
 				break;
 
 			case 3:
@@ -225,26 +387,29 @@ int main(int argc, char **argv)
 
 				for (int i = 0; i <= sp; i++)
 				{
-					printf("%d", stack[i]);
 					if (static_links[i] == 1)
 						printf("|");
+					printf("%d", stack[i]);
 				}
 
 				printf("\n");
 				break;
 
 			case 8:
-				printf("%2d JCP %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
+				printf("%2d JPC %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
 				if (stack[sp] == 0)
 					pc = text[old_pc].m;
+
+					sp = sp - 1;
 
 
 				printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 				for (int i = 0; i <= sp; i++)
 				{
-					printf("%d", stack[i]);
 					if (static_links[i] == 1)
 						printf("|");
+
+						printf("%d", stack[i]);
 				}
 
 				printf("\n");
