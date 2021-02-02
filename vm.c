@@ -41,17 +41,17 @@ int main(int argc, char **argv)
 	int old_pc  = 0;
 	int pc = 0;
 	int halt = 1;
+	instruction *IR = NULL;
 
 
-
+	// read in instructions into an array of structs
   while (feof(file_ptr) == 0)
   {
     fscanf(file_ptr, "%d %d %d", &text[count].opcode, &text[count].l, &text[count].m);
-	//	printf("%d %d %d \n", text[count].opcode, text[count].l, text[count].m);
     count++;
 
   }
-
+	// initialize stack array and static links array to keep track of the position of the static links
 	for (int i =0; i < MAX_STACK_HEIGHT; i++)
 	{
 		static_links[i] = 0;
@@ -65,11 +65,14 @@ int main(int argc, char **argv)
 
 	while (halt)
 	{
+		// fetch cycle
 		old_pc = pc;
 		pc++;
-		switch (text[old_pc].opcode)
+		IR = &text[old_pc];
+		// Execution Cycle
+		switch (IR->opcode)
 		{
-
+			// push constant value on top of stack
 			case 1:
 				sp++;
 				stack[sp] = text[old_pc].m;
@@ -84,10 +87,11 @@ int main(int argc, char **argv)
 				}
 				printf("\n");
 				break;
-
+			// Operation to be performed on data at the top of the stack
 			case 2:
 				switch (text[old_pc].m)
 				{
+					// Return to caller
 					case 0:
 						stack[bp-1] = stack[sp];
 						sp = bp-1;
@@ -107,6 +111,7 @@ int main(int argc, char **argv)
 						printf("\n");
 						break;
 
+					// switch the sign of the number at the top of the stack
 					case 1:
 						stack[sp] = -1 * stack[sp];
 						printf("%2d NEG %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
@@ -121,6 +126,7 @@ int main(int argc, char **argv)
 						printf("\n");
 						break;
 
+					// add two numbers that are on top of stack
 					case 2:
 						sp = sp - 1;
 						stack[sp] = stack[sp] + stack[sp + 1];
@@ -136,6 +142,7 @@ int main(int argc, char **argv)
 						printf("\n");
 						break;
 
+					// subtract
 					case 3:
 					sp = sp - 1;
 					stack[sp] = stack[sp] - stack[sp + 1];
@@ -151,6 +158,7 @@ int main(int argc, char **argv)
 					printf("\n");
 					break;
 
+					// multiply
 					case 4:
 						sp = sp - 1;
 						stack[sp] = stack[sp] * stack[sp+1];
@@ -168,9 +176,10 @@ int main(int argc, char **argv)
 						printf("\n");
 						break;
 
+					// divide
 					case 5:
 						sp = sp - 1;
-						stack[sp] = stack[sp] * stack[sp+1];
+						stack[sp] = stack[sp] / stack[sp+1];
 						printf("%2d DIV %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
 						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 
@@ -183,10 +192,10 @@ int main(int argc, char **argv)
 						printf("\n");
 						break;
 
+					// odd
 					case 6:
 						stack[sp] = stack[sp] % 2;
-						sp = sp - 1;
-						stack[sp] = stack[sp] * stack[sp+1];
+
 						printf("%2d ODD %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
 						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 
@@ -199,6 +208,7 @@ int main(int argc, char **argv)
 						printf("\n");
 						break;
 
+					// MOD
 					case 7:
 						sp = sp - 1;
 						stack[sp] = stack[sp] % stack[sp+1];
@@ -214,6 +224,7 @@ int main(int argc, char **argv)
 						printf("\n");
 						break;
 
+					// EQL
 					case 8:
 						sp = sp - 1;
 						stack[sp] = stack[sp] == stack[sp+1];
@@ -229,6 +240,7 @@ int main(int argc, char **argv)
 						printf("\n");
 						break;
 
+					// NEQ
 					case 9:
 						sp = sp - 1;
 						stack[sp] = stack[sp] != stack[sp+1];
@@ -244,6 +256,7 @@ int main(int argc, char **argv)
 						printf("\n");
 						break;
 
+					// LSS
 					case 10:
 						sp = sp - 1;
 						stack[sp] = stack[sp] < stack[sp+1];
@@ -259,6 +272,7 @@ int main(int argc, char **argv)
 						printf("\n");
 						break;
 
+					// LEQ
 					case 11:
 						sp = sp - 1;
 						stack[sp] = stack[sp] <= stack[sp+1];
@@ -274,6 +288,7 @@ int main(int argc, char **argv)
 						printf("\n");
 						break;
 
+					// GTR
 					case 12:
 						sp = sp - 1;
 						stack[sp] = stack[sp] > stack[sp+1];
@@ -289,9 +304,10 @@ int main(int argc, char **argv)
 						printf("\n");
 						break;
 
+					// GEQ
 					case 13:
 						sp = sp - 1;
-						stack[sp] = stack[sp] < stack[sp+1];
+						stack[sp] = stack[sp] >= stack[sp+1];
 						printf("%2d GEQ %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
 						printf("\t %2d\t%2d\t%2d\t", pc, bp, sp);
 
@@ -308,6 +324,7 @@ int main(int argc, char **argv)
 					}
 				break;
 
+			// Load number to the top of the stack
 			case 3:
 				sp = sp + 1;
 				stack[sp] = stack[base(stack, text[old_pc].l,bp) + text[old_pc].m];
@@ -324,6 +341,7 @@ int main(int argc, char **argv)
 				printf("\n");
 				break;
 
+			// Store number that is on top of the stack at the specified location
 			case 4:
 				stack[base(stack, text[old_pc].l,bp) + text[old_pc].m] = stack[sp];
 				sp = sp - 1;
@@ -340,7 +358,7 @@ int main(int argc, char **argv)
 				printf("\n");
 				break;
 
-
+			// function call
 			case 5:
 				stack[sp+1] = base(stack, text[old_pc].l,bp);
 				static_links[sp+1] = 1;
@@ -362,7 +380,7 @@ int main(int argc, char **argv)
 				printf("\n");
 				break;
 
-
+			// increment stack pointer by specified amount
 			case 6:
 				sp += text[old_pc].m;
 				printf("%2d INC %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
@@ -377,9 +395,9 @@ int main(int argc, char **argv)
 				}
 
 				printf("\n");
-
 				break;
 
+			// jump to specified instruction
 			case 7:
 				printf("%2d JMP %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
 				pc = text[old_pc].m;
@@ -395,6 +413,7 @@ int main(int argc, char **argv)
 				printf("\n");
 				break;
 
+			// if top of stack is zero, jump to specified instruction
 			case 8:
 				printf("%2d JPC %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
 				if (stack[sp] == 0)
@@ -415,9 +434,11 @@ int main(int argc, char **argv)
 				printf("\n");
 				break;
 
+			// SYS
 			case 9:
 				switch (text[old_pc].m)
 				{
+					// print value that is at the top of stack
 					case 1:
 						printf("Top of Stack Value: %d\n", stack[sp]);
 						sp--;
@@ -435,6 +456,7 @@ int main(int argc, char **argv)
 						printf("\n");
 						break;
 
+					// read in value from user and add it to the top of the stack
 					case 2:
 						sp++;
 						printf("Please Enter an Integer: ");
@@ -454,6 +476,7 @@ int main(int argc, char **argv)
 						printf("\n");
 						break;
 
+					// ends program
 					case 3:
 						printf("%2d SYS %2d %2d", old_pc, text[old_pc].l, text[old_pc].m);
 
